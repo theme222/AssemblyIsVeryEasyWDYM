@@ -5,6 +5,8 @@
 
 ok maybe it's a bit difficult xd
 
-
-
+## How to compile
+```sh
+as filename.asm -o filename.o ; gcc filename.o -o filename -nostdlib -static ; ./filename
+```
 
