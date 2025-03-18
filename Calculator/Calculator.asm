@@ -103,21 +103,118 @@ IntToString_Finalize:
 IntToString_Return:
     ret
 
+
+# Turns a string into an int64 (Callable)
+# Args 
+#   rax | char* string 
+# Returns
+#   rax | int64 value  
+StringToInt:
+    # Psuedocode
+    # total *= 10  First loop is still zero and 0 * 10 = 0
+    # total += value 
+
+    # Initialize the return value
+    mov r15, 0
+
+    jmp StringToInt_Loop
+
+StringToInt_Loop:
+
+    mov rcx, 0  # Clear rcx
+    # Get the values from the stack
+    mov cl, [rax] # Copy the byte at rax into register
+    inc rax
+
+    # Terminates the moment it finds a value that isn't a number
+    cmp cl, '0'
+    jl  StringToInt_Return
+    cmp cl, '9'
+    jg  StringToInt_Return
+
+    sub cl, '0'  # Turn into the values from 0 - 9
+    imul r15, 10  
+    add r15, rcx # Add total to return value
+
+    jmp StringToInt_Loop
+    
+StringToInt_Return:
+    mov rax, r15 
+    ret 
+
+
 _start:
 
-    mov rax, bigBoiNumber
-    imul rax, 5
+    # input first value
+    mov rax, 0
+    mov rdi, 0
+    lea rsi, inputBuffer1 
+    mov rdx, 20 
+    syscall
+
+    # input operator (+, -, *, /) value
+    mov rax, 0
+    mov rdi, 0
+    lea rsi, operatorBuffer 
+    mov rdx, 2 
+    syscall
     
+    # input second value
+    mov rax, 0
+    mov rdi, 0
+    lea rsi, inputBuffer2
+    mov rdx, 20
+    syscall
+
+    lea rax, inputBuffer1
+    call StringToInt
+    mov number1, rax
+
+    lea rax, inputBuffer2
+    call StringToInt
+    mov number2, rax
+
+    mov rax, number1
+    mov rbx, number2
+    mov sil, operatorBuffer
+    cmp sil, '+'
+    je  add
+    cmp sil, '-'
+    je  sub
+    cmp sil, '*'
+    je  mul
+    cmp sil, '/'
+    je  div
+
+add:
+    add rax, rbx
+    jmp out
+
+sub:
+    sub rax, rbx
+    jmp out
+
+mul:
+    imul rax, rbx
+    jmp out
+
+div:
+    xor rdx, rdx 
+    idiv rbx
+    jmp out
+
+out:
     lea rbx, outputBuffer
     call IntToString
-
 
     mov rax, 1
     mov rdi, 1
     lea rsi, outputBuffer
-    mov rdx, 20 
+    mov rdx, 21
     syscall
+
     jmp exit
+
 
 exit:
     mov rax, 1
@@ -130,9 +227,12 @@ exit:
     mov rdi, 0
     syscall
 
-.section .bss
 
 .section .data
-bigBoiNumber: .quad 69
+inputBuffer1: .skip 21 
+inputBuffer2: .skip 21 
+operatorBuffer: .skip 2
+number1: .quad 0
+number2: .quad 0
 outputBuffer: .skip 20
 newline: .asciz "\n"

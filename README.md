@@ -10,6 +10,11 @@ ok maybe it's a bit difficult xd
 as filename.asm -o filename.o ; gcc filename.o -o filename -nostdlib -static ; ./filename
 ```
 
+## How to view
+```sh
+objdump -d filename | less
+```
+
 ## How to time
 ```sh
 hyperfine -r 50000; ./filename

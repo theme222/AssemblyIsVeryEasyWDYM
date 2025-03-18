@@ -2,6 +2,6 @@
 
 int main()
 {
-    int i = 2000;
-    printf("%d\n", 2000*5);
+    int i = 69;
+    printf("%d\n", i*5);
 }
